@@ -1,7 +1,7 @@
 {
   "name": "rest-framework-tutorial",
   "scripts": {
-    "postdeploy": "python manage.py migrate && ./restore.sh"
+    "postdeploy": "python manage.py migrate"
   },
   "env": {
     "ENVIRONMENT": "production",
@@ -14,9 +14,6 @@
       "quantity": 1
     }
   },
-  "addons": [
-    "heroku-postgresql"
-  ],
   "buildpacks": [
     {
       "url": "heroku/python"
