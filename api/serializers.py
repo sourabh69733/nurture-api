@@ -52,6 +52,13 @@ class BookingSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class BookingSerializerGet(serializers.ModelSerializer):
+    class Meta:
+        model = Booking
+        depth = 1
+        fields = ["id", "time", "user", "advisor"]
+
+
 class AdvisorSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(max_length=100)

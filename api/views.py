@@ -4,7 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from api.models import User, Advisor, Booking
-from api.serializers import UserSerializer, AdvisorSerializer, BookingSerializer
+from api.serializers import UserSerializer, AdvisorSerializer, BookingSerializer, BookingSerializerGet
+from .util import encode, decode
 import io
 import datetime
 
@@ -25,13 +26,19 @@ def user_create_or_list(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
+        keys = data.keys()
+        if "email" not in keys or "name" not in keys or "password" not in keys:
+            return HttpResponse("400_BAD_REQUEST")
+        user_exists = User.objects.filter(email= data["email"])
+        if user_exists:
+            return HttpResponse("201_USER_EXISTS")
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             content = JSONRenderer().render(serializer.data)
             content_ = parse_data(content)
             print(content_)
-            response_data = {"UserId": content_["id"], "JWT_Token":''}
+            response_data = {"UserId": content_["id"], "JWT_Token":encode({"userId": content_["id"], "role":"user"})}
             return JsonResponse(response_data,status=200)
         return JsonResponse(serializer.errors, status=400)
 
@@ -39,12 +46,11 @@ def user_create_or_list(request):
 def user_login(request):
 
     if request.method=="POST":
-        # print(request.body)
         data = JSONParser().parse(request)
         try:
-            snippet = User.objects.all().filter(email=data["email"])[0]
+            snippet = User.objects.filter(email=data["email"])[0]
         except User.DoesNotExist:
-            return HttpResponse(status="400_BAD_REQUEST")
+            return HttpResponse(status = "HTTP_404_NOT_FOUND")
 
         serializer = UserSerializer(snippet)
         content = JSONRenderer().render(serializer.data)
@@ -56,7 +62,7 @@ def user_login(request):
         elif user["password"]!= data["password"]:
             return HttpResponse("401_AUTHENTICATION_ERROR")
         # print(user[0], user[1])
-        response_data = {"UserId": user["id"], "JWT_Token":''}
+        response_data = {"UserId": user["id"], "JWT_Token": encode({"userId": user["id"], "role":"user"})}
         return JsonResponse(response_data,status=200)
 
             
@@ -83,11 +89,13 @@ def advisor_create_or_list(request, userId=None):
 @csrf_exempt
 def book_advisor_call(request, userId, advisorId):
     if request.method=="POST":
+        # token = request.authorization
+        # print(request)
         data = JSONParser().parse(request)
         if "bookingTime" not in data.keys() or not userId or not advisorId:
             return HttpResponse("400_BAD_REQUEST")
         print(userId, advisorId)
-        booking_data = {"time": datetime.datetime.fromisoformat(data["bookingTime"]), "user_id": int(userId), "advisor_id": int(advisorId)}
+        booking_data = {"time": datetime.datetime.fromisoformat(data["bookingTime"]), "user": int(userId), "advisor": int(advisorId)}
         serializer = BookingSerializer(data = booking_data)
         print(serializer.initial_data, serializer.is_valid())
         if serializer.is_valid():
@@ -96,21 +104,25 @@ def book_advisor_call(request, userId, advisorId):
         return HttpResponse("400_BAD_REQUEST")
 
 
-def helper(data):
-    serializer = BookingSerializer(data)
-    content = JSONRenderer().render(serializer.data)
-    user = parse_data(content)
-    return user
 @csrf_exempt
-def list_booking(request, user_id):
+def list_booking(request, userId):
     if request.method=="GET":
         try:
-            booking_data = Booking.objects.filter(user_id= user_id)
+            booking_data = Booking.objects.filter(user_id= userId)
+            data =[]
+            for b in booking_data:
+                res_data = BookingSerializerGet(b)
+                data.append(res_data.data)
+            for d in data:
+                del d['user']
+                d["booking_id"] = d["id"]
+                d["booking_time"] = d["time"]
+                d['advisor_name'] = d["advisor"]["name"]
+                d["advisor_id"]   = d["advisor"]["id"]
+                d["advisor_photo"] = d["advisor"]["photoUrl"]
+                del d["advisor"]; del d["id"]; del d["time"]
+            return JsonResponse(data, safe=False)
+
         except Booking.DoesNotExist:
             return HttpResponse("400_BAD_REQUEST")
-        user = helper(booking_data)
-        for user_ in user:
-            booking = AdvisorSerializer(Advisor.objects.get(id=user_["advisor_id"]))
-        if (booking_data):
-            return JsonResponse(booking_data, 200),
-        return HttpResponse(400)
+            
