@@ -7,14 +7,14 @@ from api.models import User, Advisor, Booking
 from api.serializers import UserSerializer, AdvisorSerializer, BookingSerializer, BookingSerializerGet
 from .util import encode, decode
 import io
-import datetime
 
+# parse byte content, byte data obtained from serializer 
 def parse_data(content):
     stream = io.BytesIO(content)
     data = JSONParser().parse(stream)
     return data
 
-@csrf_exempt
+@csrf_exempt  # please find explaination at the bottom 
 def user_create_or_list(request):
     """
     List all users, or create a new user.
@@ -89,8 +89,6 @@ def advisor_create_or_list(request, userId=None):
 @csrf_exempt
 def book_advisor_call(request, userId, advisorId):
     if request.method=="POST":
-        # token = request.authorization
-        # print(request)
         data = JSONParser().parse(request)
         if "bookingTime" not in data.keys() or not userId or not advisorId:
             return HttpResponse("400_BAD_REQUEST")
@@ -126,3 +124,10 @@ def list_booking(request, userId):
         except Booking.DoesNotExist:
             return HttpResponse("400_BAD_REQUEST")
             
+
+
+# Normally when you make a request via a form you want the form being submitted to your view to originate from your website and 
+# not come from some other domain. To ensure that this happens, you can put a csrf token in your form for your view to recognize. 
+# If you add @csrf_exempt to the top of your view, then you are basically telling the view that it doesn't need the token.
+# This is a security exemption that you should take seriously.
+# As here we are using this  as API's

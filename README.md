@@ -9,8 +9,12 @@ Please let me know if you have any problem with consuming API and any error or b
 
 sourabhsahu69733@gmail.com
 ```
-## Main library or framwork and 
-* Django ()
+## Main library or framwork and dataabase
+* Django==3.1.8
+* djangorestframework==3.11.2
+* sqlite3 ( database )
+* PyJWT ( to generate jwt token used for authorization )
+
 
 ### Local setup is needed only if using it for furtuhr improvement and developement.
 All API's are consumed easily via provided hosted link
