@@ -32,8 +32,8 @@ app `api` have serializer file using django-rest-framework create json response 
 
 There are total 6 API's, listed below;
 --
-|**Sr. No.** | **Module** |**API end point** | **Method**  | **Request Body** |  **Response** | **Expectation & working** | **Comments** |
-| ------ |------- | ----- |
+| **Sr. No.** | **Module** | **API end point** | **Method**  | **Request Body** |  **Response** | **Expectation & working** | **Comments** |
+| ------ | ------- | ------- | ------- | ------- | ------- | ------- | ------- |
 | 1. | Advisor | `/api/v1/user/<int:userId>/advisor/<int:advisorId>` | POST | ```{"bookingTime":"2021-11-12 10:10:10"}``` | `200_OK` or `400_BAD_REQUEST` | It should create a booking of a advisor for a user | will add imporvements in these implementation |
 | 2. | Advisor | `/api/v1/user/<int:userId>/advisor/booking` | GET  | NA | List of advisor (name, id, photUrl, bootkingTime, bookingId ) |   | List all advisor booked by a user | NA |
 | 3. |  User | `/api/v1/user/login` | POST | `{"email":"hardik@gmail.com","password":"123456"}` | `{UserId, JWT_Token}` | login user with authorization supported by JWT token | NA |
