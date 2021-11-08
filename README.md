@@ -30,8 +30,8 @@ There are total 6 API's, listed below;
 --
 |**Sr. No.** | **Module** |**API end point** | **Method**  | **Request Body** |  **Response** | **Expectation & working** | **Comments** |
 | 1. | Advisor | `/api/v1/user/<int:userId>/advisor/<int:advisorId>` | POST | ```{"bookingTime":"2021-11-12 10:10:10"}``` | `200_OK` or `400_BAD_REQUEST` | It should create a booking of a advisor for a user | will add imporvements in these implementation |
-| 2. | Advisor | `/api/v1/user/<int:userId>/advisor/booking` | GET  | NA | ``` |   | |
+| 2. | Advisor | `/api/v1/user/<int:userId>/advisor/booking` | GET  | NA | List of advisor (name, id, photUrl, bootkingTime, bookingId ) |   | List all advisor booked by a user | |
 | 3. |  User | `/api/v1/user/login` | POST | `{"email":"hardik@gmail.com","password":"123456"}` | `{UserId, JWT_Token}` | login user with authorization supported by JWT token |  |
 | 4. | User | `/api/v1/user/register` | POST | `{"name":"hardik","email":"hardik@gmail.com","password":"123456"}` | `{UserId, JWT_Token}` | register a user with email, name and password | |
 | 5. | Admin | `/api/v1/admin/<int:userId>/advisor` | GET | NA | A array of all advisor created by admin ```[{id, name, photoUrl}] | List all advisor added by admin  | |
-| 6. | Admin | `/api/v1/admin/advisor` | POST | `{name: sourabh, photoUrl: "https://tinyurl.com/y9rxx22w" }` | `200_OK` or `400_BAD_REQUEST` | Register a advsior by admin| |
+| 6. | Admin | `/api/v1/admin/advisor` | POST | `{name: sourabh, photoUrl: "https://tinyurl.com/y9rxx22w" }` | `200_OK` or `400_BAD_REQUEST` | Register a advsior by admin | |
